@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const session = require('express-session');
 const sequelize = require('./config/database');
+const redis = require('./config/redis');
 require('./models/Task');
 require('./models/User');
 const passport = require('./config/passport');
@@ -44,6 +45,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Unexpected server error' });
 });
 
-sequelize.sync().then(() => {
+sequelize.sync().then(async () => {
+  await redis.connect();
   app.listen(process.env.PORT || 3000, () => console.log('API running'));
 });
